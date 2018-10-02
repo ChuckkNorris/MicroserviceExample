@@ -1,0 +1,39 @@
+#version: '3'
+# services:
+#  rabbitmq:
+#    image: "rabbitmq:3-management"
+#    hostname: "rabbit"
+#    ports:
+#      - "15672:15672"
+#      - "5672:5672"
+#    labels:
+#      NAME: "rabbitmq"
+#    volumes:
+#      - ./rabbitmq-isolated.conf:/etc/rabbitmq/rabbitmq.config
+version: '2'
+
+services:
+    rabbit:
+        hostname: rabbit
+        image: rabbitmq:latest
+        environment:
+            - RABBITMQ_DEFAULT_USER=admin
+            - RABBITMQ_DEFAULT_PASS=mypass
+        ports:
+            - "5673:5672"
+
+    worker:
+        build:
+            context: .
+            dockerfile: dockerfile
+        volumes:
+            - .:/app
+        links:
+            - rabbit
+        depends_on:
+            - rabbit
+    database:
+        hostname: mongo
+        image: mongo:latest
+        ports:
+            - "27018:27017"

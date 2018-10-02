@@ -1,0 +1,7 @@
+Microservices/**/obj/
+Microservices/**/bin/
+Shared/**/bin/
+Shared/**/obj/
+
+# IDE
+.vs/

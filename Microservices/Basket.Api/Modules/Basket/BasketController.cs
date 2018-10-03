@@ -9,7 +9,7 @@ using RabbitMQ.Client;
 namespace Basket.Api.Controllers
 {
     [Route("api/[controller]")]
-    public class ValuesController : Controller
+    public class BasketController : Controller
     {
         // GET api/values
         [HttpGet]

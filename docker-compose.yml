@@ -1,0 +1,20 @@
+version: '3.4'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+     - "5672:5672"
+     - "5671:5671"
+     - "15672:15672"
+
+  catalog.data:
+    image: microsoft/mssql-server-linux:2017-latest
+  catalog.api:
+    # image: catalog-api:${TAG:-latest}
+    build: ./Microservices/Catalog.Api
+      #context: .
+      # dockerfile:     
+    depends_on:
+      - catalog.data
+      - rabbitmq

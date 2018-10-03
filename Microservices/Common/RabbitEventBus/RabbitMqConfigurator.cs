@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
@@ -71,8 +72,9 @@ namespace RabbitEventBus
                 var body = ea.Body;
                 var message = Encoding.UTF8.GetString(body);
                 Console.WriteLine(" [x] Received {0}", message);
-                T eventBody = (T)Convert.ChangeType(message, typeof(T));
-                _eventHandler.Handle(eventBody);
+                T convertedMessage = JsonConvert.DeserializeObject<T>(message);
+                // T eventBody = (T)Convert.ChangeType(message, typeof(T));
+                _eventHandler.Handle(convertedMessage);
             };
             _channel.BasicConsume(queue: _eventHandler.QueueName, // "hello",
                                  autoAck: true,

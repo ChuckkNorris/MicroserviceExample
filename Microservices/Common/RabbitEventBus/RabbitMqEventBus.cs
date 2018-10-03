@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using RabbitMQ.Client;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,27 +11,44 @@ namespace RabbitEventBus
 
   
 
-    public class RabbitMqEventBus
-    {
-        private readonly RabbitMqConnection _rabbitMqConnection;
+    public class RabbitMqEventBus : IRabbitMqEventBus {
+        private readonly IRabbitMqConnection _rabbitMqConnection;
 
-        public RabbitMqEventBus(RabbitMqConnection rabbitConnection) {
+        public RabbitMqEventBus(IRabbitMqConnection rabbitConnection) {
             _rabbitMqConnection = rabbitConnection;
         }
 
-        public async Task Publish(IRabbitMqEvent rabbitMqEvent) {
+        public async Task Publish(string queueName, RabbitMqEvent rabbitMqEvent) {
             if (!_rabbitMqConnection.IsConnected) {
                 await this._rabbitMqConnection.TryConnect();
             }
-            //using (var channel = _rabbitMqConnection.CreateModel()) {
-            //    channel.ExchangeDec
-            //}
-            
+            using (var channel = _rabbitMqConnection.CreateModel()) {
+                channel.QueueDeclare(queue: queueName, // "hello",
+                                   durable: false,
+                                   exclusive: false,
+                                   autoDelete: false,
+                                   arguments: null);
+
+                // string message = "Hello World!";
+                string message = JsonConvert.SerializeObject(rabbitMqEvent);
+                var body = Encoding.UTF8.GetBytes(message);
+
+                channel.BasicPublish(exchange: "",
+                                     routingKey: queueName,
+                                     basicProperties: null,
+                                     body: body);
+                Console.WriteLine(" [x] Sent {0}", message);
+            }
+
         }
 
         public static void Subscribe<Ti, To>() {
-
+            throw new NotImplementedException();
         }
+    }
+
+    public interface IRabbitMqEventBus {
+        Task Publish(string queueName, RabbitMqEvent rabbitMqEvent);
     }
 
     public class RabbitMqEvent {
@@ -43,7 +62,4 @@ namespace RabbitEventBus
 
     }
 
-    public interface IRabbitMqEvent {
-        id
-    }
 }

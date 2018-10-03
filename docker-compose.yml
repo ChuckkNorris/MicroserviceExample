@@ -38,7 +38,9 @@ services:
   
   basket.api:
     # image: catalog-api:${TAG:-latest}
-    build: ./Microservices/Basket.Api
+    build:
+      context: .
+      dockerfile: ./Microservices/Basket.Api/Dockerfile
     networks:
       - webnet
     ports:

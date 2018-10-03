@@ -17,36 +17,39 @@ namespace RabbitEventBus
                 var logger = sp.GetRequiredService<ILogger<RabbitMqConnection>>();
                 return new RabbitMqConnection("rabbitmq", logger);
             });
+            services.AddSingleton<IRabbitMqEventBus>(sp => {
+                var connection = sp.GetRequiredService<IRabbitMqConnection>();
+                return new RabbitMqEventBus(connection);
+            });
 
             return services;
         }
 
-        public static IServiceCollection AddRabbitSubscription<T>(this IServiceCollection services, string queueName)
-            where T : IRabbitEventHandler    
+        public static IServiceCollection AddRabbitSubscription<Te, Th>(this IServiceCollection services, string queueName)
+            where Te : RabbitMqEvent
+            where Th : IRabbitEventHandler<Te>
         {
             services.AddSingleton<IHostedService>(sp => {
                 var connection = sp.GetRequiredService<IRabbitMqConnection>();
-                T eventHandler = Activator.CreateInstance<T>();
-                return new RabbitHostedService(connection, eventHandler);
-                // return new RabbitMqConnection("rabbitmq", logger);
+                Th eventHandler = Activator.CreateInstance<Th>();
+                return new RabbitHostedService<Te>(connection, eventHandler);
             });
             return services;
         }
 
     }
 
-    public interface IRabbitEventHandler {
+    public interface IRabbitEventHandler<T> {
         string QueueName { get; }
-        void Handle(string eventBody);
-
+        void Handle(T eventBody);
     }
 
-    public class RabbitHostedService : IHostedService {
+    public class RabbitHostedService<T> : IHostedService {
         private readonly IRabbitMqConnection _connection;
-        private readonly IRabbitEventHandler _eventHandler;
+        private readonly IRabbitEventHandler<T> _eventHandler;
         private IModel _channel;
 
-        public RabbitHostedService(IRabbitMqConnection rabbitMqConnection, IRabbitEventHandler eventHandler) {
+        public RabbitHostedService(IRabbitMqConnection rabbitMqConnection, IRabbitEventHandler<T> eventHandler) {
             _connection = rabbitMqConnection;
             _eventHandler = eventHandler;
         }
@@ -68,7 +71,8 @@ namespace RabbitEventBus
                 var body = ea.Body;
                 var message = Encoding.UTF8.GetString(body);
                 Console.WriteLine(" [x] Received {0}", message);
-                _eventHandler.Handle(message);
+                T eventBody = (T)Convert.ChangeType(message, typeof(T));
+                _eventHandler.Handle(eventBody);
             };
             _channel.BasicConsume(queue: _eventHandler.QueueName, // "hello",
                                  autoAck: true,

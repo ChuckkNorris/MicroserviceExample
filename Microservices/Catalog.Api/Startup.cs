@@ -31,7 +31,7 @@ namespace Catalog.Api
             // Creates persistent connection to RabbitMQ
             services.ConfigureRabbitMq();
             // Subscribe to changes in the "hello" queue
-            services.AddRabbitSubscription<UpdateStuffEventHandler>("hello");
+            services.AddRabbitSubscription<UpdateStuffEvent, UpdateStuffEventHandler>("hello");
 
             services.AddMvc();
         }
@@ -50,14 +50,14 @@ namespace Catalog.Api
         }
     }
 
-    public class UpdateStuffEvent {
+    public class UpdateStuffEvent : RabbitMqEvent {
         public string MyEventMessage { get; set; }
     }
 
-    public class UpdateStuffEventHandler : IRabbitEventHandler {
+    public class UpdateStuffEventHandler : IRabbitEventHandler<UpdateStuffEvent> {
         public string QueueName => "hello";
 
-        public void Handle(string eventBody) {
+        public void Handle(UpdateStuffEvent eventBody) {
             Console.WriteLine($"Event Handled: {eventBody}");
         }
     }

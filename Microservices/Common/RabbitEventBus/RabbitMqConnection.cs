@@ -71,39 +71,5 @@ namespace RabbitEventBus
             return this.IsConnected;
         }
 
-
-        //public async Task StartAsync(CancellationToken cancellationToken) {
-        //    while (!this.IsConnected) {
-        //        try {
-        //            this._connection = _connectionFactory.CreateConnection();
-        //        }
-        //        catch (Exception ex) {
-        //            Console.WriteLine($"{_connectionFactory?.HostName}:{_connectionFactory?.Port} -> {ex.Message}");
-        //        }
-        //        if (!this.IsConnected)
-        //            await Task.Delay(5000);
-        //    }
-        //    this._channel = _connection.CreateModel();
-        //    _channel.QueueDeclare(queue: "hello",
-        //                          durable: false,
-        //                          exclusive: false,
-        //                          autoDelete: false,
-        //                          arguments: null);
-
-        //    var consumer = new EventingBasicConsumer(_channel);
-        //    consumer.Received += (model, ea) => {
-        //        var body = ea.Body;
-        //        var message = Encoding.UTF8.GetString(body);
-        //        Console.WriteLine(" [x] Received {0}", message);
-        //    };
-        //    _channel.BasicConsume(queue: "hello",
-        //                         autoAck: true,
-        //                         consumer: consumer);
-        //}
-
-        //public async Task StopAsync(CancellationToken cancellationToken) {
-        //    this._connection.Close();
-        //    this._channel.Close();
-        //}
     }
 }

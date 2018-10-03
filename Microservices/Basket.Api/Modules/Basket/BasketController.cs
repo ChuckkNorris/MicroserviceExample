@@ -15,7 +15,15 @@ namespace Basket.Api.Controllers
         [HttpGet]
         public IEnumerable<string> Get()
         {
-            var factory = new ConnectionFactory() { HostName = "localhost" };
+            var factory = new ConnectionFactory() { 
+                HostName = "rabbitmq",
+                Port = 5672,
+                UserName = "user",
+                Password = "pass",
+                VirtualHost = "/",
+                AutomaticRecoveryEnabled = true,
+                NetworkRecoveryInterval = TimeSpan.FromSeconds(15)
+            };
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel()) {
                 channel.QueueDeclare(queue: "hello",

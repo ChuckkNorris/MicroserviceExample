@@ -16,7 +16,15 @@ public class RabitMqBackgroundService : IHostedService {
     }
 
     public RabitMqBackgroundService(string hostname = "localhost", ILogger<RabitMqBackgroundService> logger = null) {
-        this._connectionFactory = new ConnectionFactory() { HostName = hostname };
+        this._connectionFactory = new ConnectionFactory() { 
+            HostName = "rabbitmq",
+            Port = 5672,
+            UserName = "guest",
+            Password = "guest",
+            VirtualHost = "/",
+            AutomaticRecoveryEnabled = true,
+            NetworkRecoveryInterval = TimeSpan.FromSeconds(15)
+        };
     }
     
 
@@ -25,7 +33,7 @@ public class RabitMqBackgroundService : IHostedService {
             try {
                 this._connection = _connectionFactory.CreateConnection();
             } catch (Exception ex) {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine($"{_connectionFactory?.HostName}:{_connectionFactory?.Port} -> {ex.Message}");
             }
             if (!this.IsConnected)
                 await Task.Delay(5000);

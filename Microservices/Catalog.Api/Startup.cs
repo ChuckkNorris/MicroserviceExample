@@ -7,11 +7,12 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+// using Microsoft.Extensions.Hosting;
+// using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using RabbitEventBus;
 
 namespace Catalog.Api
 {
@@ -27,10 +28,12 @@ namespace Catalog.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<IHostedService, RabitMqBackgroundService>();
+            // Creates persistent connection to RabbitMQ
+            services.ConfigureRabbitMq();
+            // Subscribe to changes in the "hello" queue
+            services.AddRabbitSubscription<UpdateStuffEventHandler>("hello");
 
             services.AddMvc();
-            // ConfigureRabbitMq();
         }
 
 
@@ -44,6 +47,18 @@ namespace Catalog.Api
             }
 
             app.UseMvc();
+        }
+    }
+
+    public class UpdateStuffEvent {
+        public string MyEventMessage { get; set; }
+    }
+
+    public class UpdateStuffEventHandler : IRabbitEventHandler {
+        public string QueueName => "hello";
+
+        public void Handle(string eventBody) {
+            Console.WriteLine($"Event Handled: {eventBody}");
         }
     }
 }

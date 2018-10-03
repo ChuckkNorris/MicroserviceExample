@@ -8,9 +8,6 @@ using System.Threading.Tasks;
 
 namespace RabbitEventBus
 {
-
-  
-
     public class RabbitMqEventBus : IRabbitMqEventBus {
         private readonly IRabbitMqConnection _rabbitMqConnection;
 
@@ -29,7 +26,6 @@ namespace RabbitEventBus
                                    autoDelete: false,
                                    arguments: null);
 
-                // string message = "Hello World!";
                 string message = JsonConvert.SerializeObject(rabbitMqEvent);
                 var body = Encoding.UTF8.GetBytes(message);
 

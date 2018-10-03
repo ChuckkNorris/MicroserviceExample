@@ -33,7 +33,7 @@ namespace RabbitEventBus
             services.AddSingleton<IHostedService>(sp => {
                 var connection = sp.GetRequiredService<IRabbitMqConnection>();
                 Th eventHandler = Activator.CreateInstance<Th>();
-                return new RabbitHostedService<Te>(connection, eventHandler);
+                return new RabbitHostedService<Te>(connection, eventHandler, queueName);
             });
             return services;
         }
@@ -41,7 +41,6 @@ namespace RabbitEventBus
     }
 
     public interface IRabbitEventHandler<T> {
-        string QueueName { get; }
         void Handle(T eventBody);
     }
 
@@ -49,10 +48,12 @@ namespace RabbitEventBus
         private readonly IRabbitMqConnection _connection;
         private readonly IRabbitEventHandler<T> _eventHandler;
         private IModel _channel;
+        private readonly string _queueName;
 
-        public RabbitHostedService(IRabbitMqConnection rabbitMqConnection, IRabbitEventHandler<T> eventHandler) {
+        public RabbitHostedService(IRabbitMqConnection rabbitMqConnection, IRabbitEventHandler<T> eventHandler, string queueName) {
             _connection = rabbitMqConnection;
             _eventHandler = eventHandler;
+            _queueName = queueName;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken) {
@@ -61,7 +62,7 @@ namespace RabbitEventBus
                 throw new InvalidOperationException("Could not connect to RabbitMQ");
             }
             _channel = _connection.CreateModel();
-            _channel.QueueDeclare(queue: _eventHandler.QueueName, // "hello",
+            _channel.QueueDeclare(queue: _queueName, // "hello",
                                   durable: false,
                                   exclusive: false,
                                   autoDelete: false,
@@ -73,16 +74,16 @@ namespace RabbitEventBus
                 var message = Encoding.UTF8.GetString(body);
                 Console.WriteLine(" [x] Received {0}", message);
                 T convertedMessage = JsonConvert.DeserializeObject<T>(message);
-                // T eventBody = (T)Convert.ChangeType(message, typeof(T));
                 _eventHandler.Handle(convertedMessage);
             };
-            _channel.BasicConsume(queue: _eventHandler.QueueName, // "hello",
+            _channel.BasicConsume(queue: _queueName, // "hello",
                                  autoAck: true,
                                  consumer: consumer);
         }
 
         public async Task StopAsync(CancellationToken cancellationToken) {
-            _channel.Close();
+            if (_channel?.IsOpen ?? false)
+                _channel.Close();
         }
     }
 }

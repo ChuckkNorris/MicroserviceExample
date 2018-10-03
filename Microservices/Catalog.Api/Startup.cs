@@ -28,7 +28,7 @@ namespace Catalog.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Creates persistent connection to RabbitMQ
+            // Creates persistent connection and event bus for RabbitMQ
             services.ConfigureRabbitMq();
             // Subscribe to changes in the "hello" queue
             services.AddRabbitSubscription<UpdateStuffEvent, UpdateStuffEventHandler>("hello");
@@ -55,7 +55,6 @@ namespace Catalog.Api
     }
 
     public class UpdateStuffEventHandler : IRabbitEventHandler<UpdateStuffEvent> {
-        public string QueueName => "hello";
 
         public void Handle(UpdateStuffEvent eventBody) {
             Console.WriteLine($"Event Handled: {eventBody}");

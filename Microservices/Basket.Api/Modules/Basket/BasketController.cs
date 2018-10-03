@@ -26,32 +26,6 @@ namespace Basket.Api.Controllers
                 MyEventMessage = "Yo yo yo, what up party people?"
             };
             _eventBus.Publish("hello", message);
-            //var factory = new ConnectionFactory() { 
-            //    HostName = "rabbitmq",
-            //    Port = 5672,
-            //    UserName = "user",
-            //    Password = "pass",
-            //    VirtualHost = "/",
-            //    AutomaticRecoveryEnabled = true,
-            //    NetworkRecoveryInterval = TimeSpan.FromSeconds(15)
-            //};
-            //using (var connection = factory.CreateConnection())
-            //using (var channel = connection.CreateModel()) {
-            //    channel.QueueDeclare(queue: "hello",
-            //                         durable: false,
-            //                         exclusive: false,
-            //                         autoDelete: false,
-            //                         arguments: null);
-
-            //    string message = "Hello World!";
-            //    var body = Encoding.UTF8.GetBytes(message);
-
-            //    channel.BasicPublish(exchange: "",
-            //                         routingKey: "hello",
-            //                         basicProperties: null,
-            //                         body: body);
-            //    Console.WriteLine(" [x] Sent {0}", message);
-            //}
             return new string[] { "value1", "value2" };
         }
 

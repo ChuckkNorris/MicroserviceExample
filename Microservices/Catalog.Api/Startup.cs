@@ -35,8 +35,8 @@ namespace Catalog.Api
 
             // This line uses 'UseSqlServer' in the 'options' parameter
             // with the connection string defined above.
-            services.AddDbContext<CatalogContext>(
-                options => options.UseSqlServer(connection));
+            services.AddDbContext<CatalogContext>(options =>
+                options.UseSqlServer(connection));
 
             //services.AddIdentity<ApplicationUser, IdentityRole>()
             //    .AddEntityFrameworkStores<ApplicationDbContext>()

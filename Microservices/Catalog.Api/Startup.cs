@@ -46,6 +46,7 @@ namespace Catalog.Api
             services.ConfigureRabbitMq();
             // Subscribe to changes in the "hello" queue
             services.AddRabbitSubscription<UpdateStuffEvent, UpdateStuffEventHandler>("hello");
+            // services.AddRabbitSubscription<UpdateStuffEvent, UpdateStuffEventHandler>("hello");
 
             services.AddMvc();
         }
@@ -60,8 +61,6 @@ namespace Catalog.Api
                 app.UseDeveloperExceptionPage();
             }
 
-            
-
             app.UseMvc();
         }
     }
@@ -71,9 +70,13 @@ namespace Catalog.Api
     }
 
     public class UpdateStuffEventHandler : IRabbitEventHandler<UpdateStuffEvent> {
-
+        // private readonly CatalogContext _context;
+        // public UpdateStuffEventHandler(CatalogContext context) {
+        //     _context = context;
+        // }
         public void Handle(UpdateStuffEvent eventBody) {
-            Console.WriteLine($"Event Handled: {eventBody}");
+            
+            Console.WriteLine($"Catalog - UpdateStuffEvent Handled: {eventBody.Id} {eventBody.MyEventMessage}");
         }
     }
 }

@@ -18,9 +18,10 @@ namespace Basket.Api.Controllers
         ) {
             _eventBus = eventBus;
         }
+
         // GET api/values
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IEnumerable<string> GetUserBasket()
         {
             var message = new UpdateStuffEvent() {
                 MyEventMessage = "Yo yo yo, what up party people?"

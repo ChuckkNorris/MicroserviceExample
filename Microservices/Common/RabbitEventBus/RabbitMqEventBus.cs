@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 namespace RabbitEventBus
 {
     public class RabbitMqEventBus : IRabbitMqEventBus {
+
+        internal const string EXAMPLE_EXCHANGE_NAME = "microservice_example_event_bus";
         private readonly IRabbitMqConnection _rabbitMqConnection;
 
         public RabbitMqEventBus(IRabbitMqConnection rabbitConnection) {
@@ -19,21 +21,35 @@ namespace RabbitEventBus
             if (!_rabbitMqConnection.IsConnected) {
                 await this._rabbitMqConnection.TryConnect();
             }
+
+            string message = JsonConvert.SerializeObject(rabbitMqEvent);
+            var body = Encoding.UTF8.GetBytes(message);
+
             using (var channel = _rabbitMqConnection.CreateModel()) {
-                channel.QueueDeclare(queue: queueName, // "hello",
-                                   durable: false,
-                                   exclusive: false,
-                                   autoDelete: false,
-                                   arguments: null);
+                string eventName = rabbitMqEvent.GetType().Name;
+                channel.ExchangeDeclare(exchange: EXAMPLE_EXCHANGE_NAME, type: "direct");
+                var channelProps = channel.CreateBasicProperties();
+                channelProps.DeliveryMode = 2; // Persistent (stored to disk)
+                channel.BasicPublish(exchange: EXAMPLE_EXCHANGE_NAME,
+                    routingKey: eventName,
+                    mandatory: true,
+                    basicProperties: channelProps,
+                    body: body);
 
-                string message = JsonConvert.SerializeObject(rabbitMqEvent);
-                var body = Encoding.UTF8.GetBytes(message);
+                //channel.QueueDeclare(queue: queueName,
+                //                   durable: false,
+                //                   exclusive: false,
+                //                   autoDelete: false,
+                //                   arguments: null);
 
-                channel.BasicPublish(exchange: "",
-                                     routingKey: queueName,
-                                     basicProperties: null,
-                                     body: body);
-                Console.WriteLine(" [x] Sent {0}", message);
+                //string message = JsonConvert.SerializeObject(rabbitMqEvent);
+                //var body = Encoding.UTF8.GetBytes(message);
+
+                //channel.BasicPublish(exchange: "",
+                //                     routingKey: queueName,
+                //                     basicProperties: null,
+                //                     body: body);
+                Console.WriteLine($" [x] Sent {message}, {eventName}, {queueName}");
             }
 
         }

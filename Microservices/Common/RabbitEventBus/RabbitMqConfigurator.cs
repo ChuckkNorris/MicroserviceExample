@@ -13,6 +13,7 @@ namespace RabbitEventBus
 {
     public static class RabbitMqConfigurator
     {
+
         public static IServiceCollection ConfigureRabbitMq(this IServiceCollection services) {
             services.AddSingleton<IRabbitMqConnection>(sp => {
                 var logger = sp.GetRequiredService<ILogger<RabbitMqConnection>>();
@@ -30,9 +31,12 @@ namespace RabbitEventBus
             where Te : RabbitMqEvent
             where Th : IRabbitEventHandler<Te>
         {
+            // typeof(IRabbitEventHandler<Te>),
+            services.AddTransient(typeof(Th));
             services.AddSingleton<IHostedService>(sp => {
                 var connection = sp.GetRequiredService<IRabbitMqConnection>();
-                Th eventHandler = Activator.CreateInstance<Th>();
+                Th eventHandler = sp.GetRequiredService<Th>();
+                // Th eventHandler = Activator.CreateInstance<Th>();
                 return new RabbitHostedService<Te>(connection, eventHandler, queueName);
             });
             return services;
@@ -61,24 +65,50 @@ namespace RabbitEventBus
             if (!_connection.IsConnected) {
                 throw new InvalidOperationException("Could not connect to RabbitMQ");
             }
+            // var eventName = typeof(T).Name;
+            // Console.WriteLine($"Event Name: {eventName}");
+
             _channel = _connection.CreateModel();
-            _channel.QueueDeclare(queue: _queueName, // "hello",
-                                  durable: false,
-                                  exclusive: false,
-                                  autoDelete: false,
-                                  arguments: null);
+            _channel.ExchangeDeclare(exchange: RabbitMqEventBus.EXAMPLE_EXCHANGE_NAME, type: "direct");
+
+            _channel.QueueDeclare(queue: _queueName,
+                                durable: true,
+                                exclusive: false,
+                                autoDelete: false,
+                                arguments: null);
+
 
             var consumer = new EventingBasicConsumer(_channel);
-            consumer.Received += (model, ea) => {
-                var body = ea.Body;
-                var message = Encoding.UTF8.GetString(body);
-                Console.WriteLine(" [x] Received {0}", message);
+            consumer.Received += async (model, ea) => {
+                var eventName = ea.RoutingKey;
+                var message = Encoding.UTF8.GetString(ea.Body);
+                Console.WriteLine($" [x] Received {message}, {eventName}");
                 T convertedMessage = JsonConvert.DeserializeObject<T>(message);
                 _eventHandler.Handle(convertedMessage);
+                _channel.BasicAck(ea.DeliveryTag, multiple: false);
             };
-            _channel.BasicConsume(queue: _queueName, // "hello",
-                                 autoAck: true,
+
+            _channel.BasicConsume(queue: _queueName,
+                                 autoAck: false,
                                  consumer: consumer);
+
+            //_channel.QueueDeclare(queue: _queueName, // "hello",
+            //                      durable: false,
+            //                      exclusive: false,
+            //                      autoDelete: false,
+            //                      arguments: null);
+
+            //var consumer = new EventingBasicConsumer(_channel);
+            //consumer.Received += (model, ea) => {
+            //    var body = ea.Body;
+            //    var message = Encoding.UTF8.GetString(body);
+            //    Console.WriteLine(" [x] Received {0}", message);
+            //    T convertedMessage = JsonConvert.DeserializeObject<T>(message);
+            //    _eventHandler.Handle(convertedMessage);
+            //};
+            //_channel.BasicConsume(queue: _queueName, // "hello",
+            //                     autoAck: true,
+            //                     consumer: consumer);
         }
 
         public async Task StopAsync(CancellationToken cancellationToken) {

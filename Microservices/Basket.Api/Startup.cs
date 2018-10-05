@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Basket.Api.Controllers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -25,6 +26,7 @@ namespace Basket.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.ConfigureRabbitMq();
+            services.AddRabbitSubscription<ProductPriceChangedEvent, ProductPriceChangedEventHandler>("ProductPriceChanged");
             services.AddMvc();
         }
 
@@ -39,4 +41,16 @@ namespace Basket.Api
             app.UseMvc();
         }
     }
+
+    public class ProductPriceChangedEvent : RabbitMqEvent {
+        public string ProductName { get; set; }
+        public decimal Price { get; set; }
+    }
+
+    public class ProductPriceChangedEventHandler : IRabbitEventHandler<ProductPriceChangedEvent> {
+        public void Handle(ProductPriceChangedEvent eventBody) {
+            Console.WriteLine($"Basket - ProductPriceChangedEvent Handled: {eventBody.ProductName} {eventBody.Price}");
+        }
+    }
+
 }

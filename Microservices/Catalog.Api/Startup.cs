@@ -13,6 +13,8 @@ using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitEventBus;
+using Catalog.Api.Modules.Catalog;
+using Microsoft.EntityFrameworkCore;
 
 namespace Catalog.Api
 {
@@ -28,6 +30,18 @@ namespace Catalog.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            var connection = @"Server=catalog.data;Database=master;User=sa;Password=Cobra1234;";
+
+            // This line uses 'UseSqlServer' in the 'options' parameter
+            // with the connection string defined above.
+            services.AddDbContext<CatalogContext>(
+                options => options.UseSqlServer(connection));
+
+            //services.AddIdentity<ApplicationUser, IdentityRole>()
+            //    .AddEntityFrameworkStores<ApplicationDbContext>()
+            //    .AddDefaultTokenProviders();
+
             // Creates persistent connection and event bus for RabbitMQ
             services.ConfigureRabbitMq();
             // Subscribe to changes in the "hello" queue
@@ -45,6 +59,8 @@ namespace Catalog.Api
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            
 
             app.UseMvc();
         }

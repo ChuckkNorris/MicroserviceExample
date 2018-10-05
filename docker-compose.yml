@@ -1,6 +1,7 @@
 version: '3.4'
 
 services:
+  # Rabbit MQ Server
   rabbitmq:
     image: rabbitmq:3-management-alpine
     hostname: "rabbitmq"
@@ -21,10 +22,23 @@ services:
       timeout: 10s
       retries: 5
 
+  # Catalog Microservice
   catalog.data:
     image: microsoft/mssql-server-linux:2017-latest
+    # user: $UID # "sa" if not set
+    environment:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: "Cobra1234"
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssqldata:/var/opt/mssql
+    networks:
+      - webnet
+
   catalog.api:
     # image: catalog-api:${TAG:-latest}
+    restart: on-failure
     build:
       context: .
       dockerfile: Microservices/Catalog.Api/Dockerfile
@@ -36,6 +50,7 @@ services:
       - catalog.data
       - rabbitmq
   
+  # Basket Microservice
   basket.api:
     # image: catalog-api:${TAG:-latest}
     build:
@@ -47,7 +62,10 @@ services:
       - "4002:80"
     depends_on:
       - rabbitmq
-      
+
+volumes:
+  mssqldata:
+
 networks:
   webnet:
     driver: bridge

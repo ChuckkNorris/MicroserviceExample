@@ -1,0 +1,2 @@
+catalog-api:latest
+basket-api:latest

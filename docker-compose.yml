@@ -37,7 +37,7 @@ services:
       - webnet
 
   catalog.api:
-    # image: catalog-api:${TAG:-latest}
+    image: catalog-api:${TAG:-latest}
     restart: on-failure
     build:
       context: .
@@ -52,7 +52,7 @@ services:
   
   # Basket Microservice
   basket.api:
-    # image: catalog-api:${TAG:-latest}
+    image: basket-api:${TAG:-latest}
     build:
       context: .
       dockerfile: ./Microservices/Basket.Api/Dockerfile

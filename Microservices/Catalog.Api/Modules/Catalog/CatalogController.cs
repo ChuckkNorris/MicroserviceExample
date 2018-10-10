@@ -15,10 +15,10 @@ namespace Catalog.Api.Controllers
         private readonly IRabbitMqEventBus _eventBus;
         public CatalogController(
             // CatalogContext context,
-            IRabbitMqEventBus eventBus
+            // IRabbitMqEventBus eventBus
         ) {
             // _context = context;
-            _eventBus = eventBus;
+            // _eventBus = eventBus;
         }
 
         // GET api/values
@@ -27,8 +27,8 @@ namespace Catalog.Api.Controllers
         {
             // _context.Products.Add(new Product { Name = "Burger", Price = 12.50m });
             // await _context.SaveChangesAsync();
-            await this._eventBus.Publish(queueName: "ProductPriceChanged",rabbitMqEvent: new ProductPriceChangedEvent { Price = 12.62m, ProductName = "Banana" });
-            return new string[] { "value1", "value2" };
+            // await this._eventBus.Publish(queueName: "ProductPriceChanged",rabbitMqEvent: new ProductPriceChangedEvent { Price = 12.62m, ProductName = "Banana" });
+            return new string[] { "catalog", "value2" };
         }
 
         // GET api/values/5

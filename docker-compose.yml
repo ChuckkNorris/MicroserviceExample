@@ -1,40 +1,40 @@
 version: '3.4'
 
 services:
-  # Rabbit MQ Server
-  rabbitmq:
-    image: rabbitmq:3-management-alpine
-    hostname: "rabbitmq"
-    environment:
-      RABBITMQ_ERLANG_COOKIE: "cookie"
-      RABBITMQ_DEFAULT_USER: "user"
-      RABBITMQ_DEFAULT_PASS: "pass"
-      RABBITMQ_DEFAULT_VHOST: "/"
-    ports:
-      - "5672:5672"
-      - "5671:5671"
-      - "15672:15672"
-    networks:
-      - webnet
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:15672"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+  # # Rabbit MQ Server
+  # rabbitmq:
+  #   image: rabbitmq:3-management-alpine
+  #   hostname: "rabbitmq"
+  #   environment:
+  #     RABBITMQ_ERLANG_COOKIE: "cookie"
+  #     RABBITMQ_DEFAULT_USER: "user"
+  #     RABBITMQ_DEFAULT_PASS: "pass"
+  #     RABBITMQ_DEFAULT_VHOST: "/"
+  #   ports:
+  #     - "5672:5672"
+  #     - "5671:5671"
+  #     - "15672:15672"
+  #   networks:
+  #     - webnet
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:15672"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
 
   # Catalog Microservice
-  catalog.data:
-    image: microsoft/mssql-server-linux:2017-latest
-    # user: $UID # "sa" if not set
-    environment:
-      ACCEPT_EULA: Y
-      SA_PASSWORD: "Cobra1234"
-    ports:
-      - "1433:1433"
-    volumes:
-      - mssqldata:/var/opt/mssql
-    networks:
-      - webnet
+  # catalog.data:
+  #   image: microsoft/mssql-server-linux:2017-latest
+  #   # user: $UID # "sa" if not set
+  #   environment:
+  #     ACCEPT_EULA: Y
+  #     SA_PASSWORD: "Cobra1234"
+  #   ports:
+  #     - "1433:1433"
+  #   volumes:
+  #     - mssqldata:/var/opt/mssql
+  #   networks:
+  #     - webnet
 
   catalog.api:
     image: catalog-api:${TAG:-latest}
@@ -46,9 +46,9 @@ services:
       - webnet
     ports:
       - "4001:80"
-    depends_on:
-      - catalog.data
-      - rabbitmq
+    # depends_on:
+    #   - catalog.data
+    #   - rabbitmq
   
   # Basket Microservice
   basket.api:
@@ -60,11 +60,11 @@ services:
       - webnet
     ports:
       - "4002:80"
-    depends_on:
-      - rabbitmq
+    # depends_on:
+    #   - rabbitmq
 
-volumes:
-  mssqldata:
+# volumes:
+#   mssqldata:
 
 networks:
   webnet:

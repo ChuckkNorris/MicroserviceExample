@@ -31,21 +31,21 @@ namespace Catalog.Api
         public void ConfigureServices(IServiceCollection services)
         {
 
-            var connection = @"Server=catalog.data;Database=master;User=sa;Password=Cobra1234;";
+            // var connection = @"Server=catalog.data;Database=master;User=sa;Password=Cobra1234;";
 
             // This line uses 'UseSqlServer' in the 'options' parameter
             // with the connection string defined above.
-            services.AddDbContext<CatalogContext>(options =>
-                options.UseSqlServer(connection));
+            // services.AddDbContext<CatalogContext>(options =>
+            //     options.UseSqlServer(connection));
 
             //services.AddIdentity<ApplicationUser, IdentityRole>()
             //    .AddEntityFrameworkStores<ApplicationDbContext>()
             //    .AddDefaultTokenProviders();
 
             // Creates persistent connection and event bus for RabbitMQ
-            services.ConfigureRabbitMq();
+            // services.ConfigureRabbitMq();
             // Subscribe to changes in the "hello" queue
-            services.AddRabbitSubscription<UpdateStuffEvent, UpdateStuffEventHandler>("hello");
+            // services.AddRabbitSubscription<UpdateStuffEvent, UpdateStuffEventHandler>("hello");
             // services.AddRabbitSubscription<UpdateStuffEvent, UpdateStuffEventHandler>("hello");
 
             services.AddMvc();

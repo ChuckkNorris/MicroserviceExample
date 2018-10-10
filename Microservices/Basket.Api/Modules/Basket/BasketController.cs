@@ -12,22 +12,22 @@ namespace Basket.Api.Controllers
     [Route("api/[controller]")]
     public class BasketController : Controller
     {
-        private readonly IRabbitMqEventBus _eventBus;
+        // private readonly IRabbitMqEventBus _eventBus;
         public BasketController(
-            IRabbitMqEventBus eventBus
+            // IRabbitMqEventBus eventBus
         ) {
-            _eventBus = eventBus;
+            // _eventBus = eventBus;
         }
 
         // GET api/values
         [HttpGet]
         public IEnumerable<string> GetUserBasket()
         {
-            var message = new UpdateStuffEvent() {
-                MyEventMessage = "Yo yo yo, what up party people?"
-            };
-            _eventBus.Publish("hello", message);
-            return new string[] { "value1", "value2" };
+            // var message = new UpdateStuffEvent() {
+            //     MyEventMessage = "Yo yo yo, what up party people?"
+            // };
+            // _eventBus.Publish("hello", message);
+            return new string[] { "basket", "value2" };
         }
 
         // GET api/values/5

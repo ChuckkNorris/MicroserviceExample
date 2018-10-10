@@ -18,8 +18,8 @@
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.4" />
   </ItemGroup>
 
-  <ItemGroup>
+  <!-- <ItemGroup>
     <ProjectReference Include="..\Common\RabbitEventBus\RabbitEventBus.csproj" />
-  </ItemGroup>
+  </ItemGroup> -->
 
 </Project>

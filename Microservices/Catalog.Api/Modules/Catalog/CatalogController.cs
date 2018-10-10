@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Catalog.Api.Modules.Catalog;
 using Microsoft.AspNetCore.Mvc;
-using RabbitEventBus;
+// using RabbitEventBus;
 
 namespace Catalog.Api.Controllers
 {

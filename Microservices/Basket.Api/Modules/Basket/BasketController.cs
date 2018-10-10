@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using RabbitEventBus;
+// using RabbitEventBus;
 using RabbitMQ.Client;
 
 namespace Basket.Api.Controllers

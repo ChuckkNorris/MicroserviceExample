@@ -12,7 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using RabbitEventBus;
+// using RabbitEventBus;
 using Catalog.Api.Modules.Catalog;
 using Microsoft.EntityFrameworkCore;
 
